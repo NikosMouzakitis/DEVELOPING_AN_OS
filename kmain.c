@@ -32,7 +32,7 @@ void delay(int i, int j, int k)
 	int x, y, z;
 	for( x = 0; x < i; x++)
 		for(y = 0; y < j; y++)
-			for(z = 0; z < k; z++)
+			for(z = 0; z < k/10; z++)
 				;
 }
 
@@ -51,9 +51,13 @@ void kmain(void)
 
 	//display first message on screen.
 	fb_writeln(osInitialmsg, strlen(osInitialmsg));
+	serial_writeln(osInitialmsg, strlen(osInitialmsg),com);
 	delay(100,1000,200);	
+	serial_writeln("Developed by Nikos Mouzakitis", strlen("Developed by Nikos Mouzakitis"),com);
 	fb_writeln("Developed by Nikos Mouzakitis", strlen("Developed by Nikos Mouzakitis"));
 	delay(100,1000,200);	
+
+	serial_writeln("2019-2020", strlen("2019-2020"), com);	
 	fb_writeln("2019-2020", strlen("2019-2020"));
 	
 	//write first message on serial.
@@ -63,10 +67,10 @@ void kmain(void)
 	serial_writeln("Setting Global Descriptor Table", strlen("Setting Global Descriptor Table"), com);	
 	fb_writeln("Setting Global Descriptor Table", strlen("Setting Global Descriptor Table"));	
 	//initializing the Global Descriptor Table
+
 	init_gdt();
 	serial_writeln("Global Descriptor Table done", strlen("Global Descriptor Table done"), com);	
 	fb_writeln("Global Descriptor Table done", strlen("Global Descriptor Table done"));	
 	while(1)
 		;
-
 }

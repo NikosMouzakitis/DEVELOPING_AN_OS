@@ -32,7 +32,8 @@ os.iso: kernel.elf
 	iso
 
 run: os.iso
-	bochs -f bochs.txt -q
+	qemu-system-x86_64 -kernel kernel.elf	
+#bochs -f bochs.txt -q
 
 %.o: %.s 
 	$(AS) $(ASFLAGS) $< -o $@

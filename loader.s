@@ -25,7 +25,7 @@ loader:
 	
 	mov	esp, kernel_stack+KERNEL_STACK_SIZE	; saving at esp to the start of the kernel start(grows downwards)
 
-	call	kmain		; calling the C function from kmain.c
+	call	kmain		; calling the C function from kmain.c, entering the OS
 
 loop:
 	jmp	loop

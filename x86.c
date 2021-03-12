@@ -28,6 +28,7 @@ void init_idt_desc(unsigned short select, unsigned int offset, unsigned short ty
 /*
  * Init IDT after kernel is loaded
  */
+
 void init_idt(void)
 {
 	// Init irq 
@@ -99,6 +100,7 @@ void init_gdt(void)
 
 
 	// AT&T style assembly
+
 	/* load the gdtr registry */
 	asm("lgdtl (kgdtr)");
 
@@ -147,4 +149,3 @@ void do_syscalls(int num){
 	 asm("sti");
 }
 */
-
