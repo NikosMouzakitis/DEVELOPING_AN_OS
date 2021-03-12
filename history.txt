@@ -1,0 +1,4 @@
+After having the first  functions for moving the cursor and writing on cells f the screen we develop:
+
+
+: 1 :	implementing a strlen alike function to count the bytes of a text to print.
