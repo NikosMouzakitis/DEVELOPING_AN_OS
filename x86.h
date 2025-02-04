@@ -51,3 +51,7 @@ void init_idt_desc(unsigned short select, unsigned int offset, unsigned short ty
 void init_gdt_desc(u32 base, u32 limit, u8 access, u8 other,struct gdtdesc *desc);
 void init_gdt(void);
 void do_syscalls(int num);
+void isr_default_int(int num);
+void isr_schedule_int(int num);
+void isr_GP_exc(int num);
+void isr_PF_exc(int num);

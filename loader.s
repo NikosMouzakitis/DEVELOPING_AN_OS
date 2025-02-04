@@ -28,4 +28,4 @@ loader:
 	call	kmain		; calling the C function from kmain.c, entering the OS
 
 loop:
-	jmp	loop
+	jmp loop

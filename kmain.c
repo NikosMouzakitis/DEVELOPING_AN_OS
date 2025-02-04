@@ -6,6 +6,8 @@
 #define BG_GREEN	2
 #define BG_BLACK	0 
 
+// @author N.M
+//
 /* cleaning screen by using the framebuffer */
 void clear_screen(void)
 {
@@ -36,41 +38,38 @@ void delay(int i, int j, int k)
 				;
 }
 
+void print(char * s, int l, int com)
+{
+	fb_writeln(s, l);
+	serial_writeln(s, l, SERIAL_COM1_BASE);
+}
+//wrapper to get an easier way to print-non formated!!!
+void pprint(char *s)
+{
+	print(s,strlen(s),SERIAL_COM1_BASE);
+}
+
 /* start execution of testOS */
 void kmain(void)
 {
 	char * osInitialmsg = "TestOS initialized.";
 	int com = SERIAL_COM1_BASE;
 //	struct gdtr GDT[8]; // exist in x86
-
 	cursorPos = 0;
-
 	//setting up COM1 and clearing screen.	
 	set_up_com(com);	
 	clear_screen();
-
 	//display first message on screen.
-	fb_writeln(osInitialmsg, strlen(osInitialmsg));
-	serial_writeln(osInitialmsg, strlen(osInitialmsg),com);
+	pprint(osInitialmsg);
 	delay(100,1000,200);	
-	serial_writeln("Developed by Nikos Mouzakitis", strlen("Developed by Nikos Mouzakitis"),com);
-	fb_writeln("Developed by Nikos Mouzakitis", strlen("Developed by Nikos Mouzakitis"));
-	delay(100,1000,200);	
-
-	serial_writeln("2019-2020", strlen("2019-2020"), com);	
-	fb_writeln("2019-2020", strlen("2019-2020"));
-	
 	//write first message on serial.
-	serial_writeln("init", strlen("init"), com);	
-	fb_writeln("init", strlen("init"));	
+	pprint("init");	
 
-	serial_writeln("Setting Global Descriptor Table", strlen("Setting Global Descriptor Table"), com);	
-	fb_writeln("Setting Global Descriptor Table", strlen("Setting Global Descriptor Table"));	
+	pprint("Setting Global Descriptor Table");	
 	//initializing the Global Descriptor Table
-
 	init_gdt();
-	serial_writeln("Global Descriptor Table done", strlen("Global Descriptor Table done"), com);	
-	fb_writeln("Global Descriptor Table done", strlen("Global Descriptor Table done"));	
-	while(1)
-		;
+	print("Global Descriptor Table done", strlen("Global Descriptor Table done"), com);	
+
+	init_idt();	
+	pprint("Interrupt Descriptor Table done");	
 }

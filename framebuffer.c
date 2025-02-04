@@ -12,7 +12,7 @@ void update_cursor_position(void)
 	fb_move_cursor(cursorPos);
 }
 
-/* adnvancing cursor to the start of the next line of the framebuffer. */
+/* advancing cursor to the start of the next line of the framebuffer. */
 void update_cursor_next_line(void)
 {
 	unsigned int ret;

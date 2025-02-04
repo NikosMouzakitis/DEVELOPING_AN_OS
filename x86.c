@@ -17,12 +17,12 @@ extern void _asm_schedule(void);
 // Function to define an IDT segment
 void init_idt_desc(unsigned short select, unsigned int offset, unsigned short type,struct idtdesc *desc)
 {
-/*	
+	
 	desc->offset0_15 = (offset & 0xffff);
 	desc->select = select;
 	desc->type = type;
 	desc->offset16_31 = (offset & 0xffff0000) >> 16;
-*/	
+	
 }
 
 /*
@@ -32,7 +32,7 @@ void init_idt_desc(unsigned short select, unsigned int offset, unsigned short ty
 void init_idt(void)
 {
 	// Init irq 
-/*	
+	
 	int i;
 	for (i = 0; i < IDTSIZE; i++) 
 		init_idt_desc(0x08, (u32)_asm_schedule, INTGATE, &kidt[i]); // 
@@ -56,9 +56,8 @@ void init_idt(void)
 
 	// Load the IDTR registry
 	asm("lidtl (kidtr)");
-*/	
+	
 }
-
 
 /*
  * 'init_desc' initialize a segment descriptor in gdt or ldt.
@@ -80,7 +79,6 @@ void init_gdt_desc(u32 base, u32 limit, u8 access, u8 other,struct gdtdesc *desc
  */
 void init_gdt(void)
 {
-
 	/* initialize gdt segments */
 	init_gdt_desc(0x0, 0x0, 0x0, 0x0, &kgdt[0]);
 	init_gdt_desc(0x0, 0xFFFFF, 0x9B, 0x0D, &kgdt[1]);	/* code */
@@ -98,9 +96,7 @@ void init_gdt(void)
 	/* copy the gdtr to its memory area */
 	memcpy((char *) kgdtr.base, (char *) kgdt, kgdtr.limit);
 
-
 	// AT&T style assembly
-
 	/* load the gdtr registry */
 	asm("lgdtl (kgdtr)");
 
@@ -129,23 +125,39 @@ void isr_bbd_int(void)
 }
 
 
-/* hide for the mo
-
+// hide for the mo
 void do_syscalls(int num){
 	 u32 ret,ret1,ret2,ret3,ret4;
+	 
 	 asm("mov %%ebx, %0": "=m"(ret):);
 	 asm("mov %%ecx, %0": "=m"(ret1):);
 	 asm("mov %%edx, %0": "=m"(ret2):);
 	 asm("mov %%edi, %0": "=m"(ret3):);
 	 asm("mov %%esi, %0": "=m"(ret4):);
-	 
 	  //fix the following comes from C++ code. 
 	 //arch.setParam(ret,ret1,ret2,ret3,ret4);
+	
 	 asm("cli");
 	 asm("mov %%ebp, %0": "=m"(stack_ptr):);
 
 	 
-	 syscall.call(num);
+	 //syscall.call(num);
+	 
 	 asm("sti");
 }
-*/
+void isr_default_int(int num)
+{
+	return ;
+}
+void isr_schedule_int(int num)
+{
+	return ;
+}
+void isr_GP_exc(int num)
+{
+	return ;
+}
+void isr_PF_exc(int num)
+{
+	return ;
+}
