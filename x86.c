@@ -28,35 +28,33 @@ void init_idt_desc(unsigned short select, unsigned int offset, unsigned short ty
 /*
  * Init IDT after kernel is loaded
  */
-
 void init_idt(void)
 {
-	// Init irq 
-	
-	int i;
-	for (i = 0; i < IDTSIZE; i++) 
-		init_idt_desc(0x08, (u32)_asm_schedule, INTGATE, &kidt[i]); // 
-	
-	// Vectors  0 -> 31 are for exceptions 
-	init_idt_desc(0x08, (u32) _asm_exc_GP, INTGATE, &kidt[13]);		// #GP 
-	init_idt_desc(0x08, (u32) _asm_exc_PF, INTGATE, &kidt[14]);     // #PF 
-	
-	init_idt_desc(0x08, (u32) _asm_schedule, INTGATE, &kidt[32]);
-	init_idt_desc(0x08, (u32) _asm_int_1, INTGATE, &kidt[33]);
-	
-	init_idt_desc(0x08, (u32) _asm_syscalls, TRAPGATE, &kidt[48]);
-	init_idt_desc(0x08, (u32) _asm_syscalls, TRAPGATE, &kidt[128]); //48
-	
-	kidtr.limit = IDTSIZE * 8;
-	kidtr.base = IDTBASE;
-	
-	
-	// Copy the IDT to the memory 
-	memcpy((char *) kidtr.base, (char *) kidt, kidtr.limit);
+    int i;
 
-	// Load the IDTR registry
-	asm("lidtl (kidtr)");
-	
+    // Initialize all IDT entries with default handler (_asm_schedule)
+    for (i = 0; i < IDTSIZE; i++) {
+        init_idt_desc(0x08, (u32)_asm_schedule, INTGATE, &kidt[i]);
+    }
+
+    // Set up exceptions
+    init_idt_desc(0x08, (u32)_asm_exc_GP, INTGATE, &kidt[13]);  // #GP
+    init_idt_desc(0x08, (u32)_asm_exc_PF, INTGATE, &kidt[14]);  // #PF
+
+    // Set up IRQ handlers
+    init_idt_desc(0x08, (u32)_asm_schedule, INTGATE, &kidt[32]);
+    init_idt_desc(0x08, (u32)_asm_int_1, INTGATE, &kidt[33]);
+
+    // System call handling
+    init_idt_desc(0x08, (u32)_asm_syscalls, TRAPGATE, &kidt[48]);  // Syscall
+    init_idt_desc(0x08, (u32)_asm_syscalls, TRAPGATE, &kidt[128]); // Syscall
+
+    // Set IDTR values
+    kidtr.limit = sizeof(kidt) - 1;
+    kidtr.base = (u32)kidt;
+
+    // Load IDT
+    asm volatile("lidt %0" : : "m" (kidtr));
 }
 
 /*
@@ -79,35 +77,31 @@ void init_gdt_desc(u32 base, u32 limit, u8 access, u8 other,struct gdtdesc *desc
  */
 void init_gdt(void)
 {
-	/* initialize gdt segments */
-	init_gdt_desc(0x0, 0x0, 0x0, 0x0, &kgdt[0]);
-	init_gdt_desc(0x0, 0xFFFFF, 0x9B, 0x0D, &kgdt[1]);	/* code */
-	init_gdt_desc(0x0, 0xFFFFF, 0x93, 0x0D, &kgdt[2]);	/* data */
-	init_gdt_desc(0x0, 0x0, 0x97, 0x0D, &kgdt[3]);		/* stack */
-	init_gdt_desc(0x0, 0xFFFFF, 0xFF, 0x0D, &kgdt[4]);	/* ucode */
-	init_gdt_desc(0x0, 0xFFFFF, 0xF3, 0x0D, &kgdt[5]);	/* udata */
-	init_gdt_desc(0x0, 0x0, 0xF7, 0x0D, &kgdt[6]);		/* ustack */
-//	init_gdt_desc((u32)&default_tss, 0x67, 0xE9, 0x00, &kgdt[7]);	/* tss */
+    /* initialize gdt segments */
+    init_gdt_desc(0x0, 0x0, 0x0, 0x0, &kgdt[0]);  /* null descriptor */
+    init_gdt_desc(0x0, 0xFFFFF, 0x9A, 0x0D, &kgdt[1]);  /* kernel code */
+    init_gdt_desc(0x0, 0xFFFFF, 0x92, 0x0D, &kgdt[2]);  /* kernel data */
+    init_gdt_desc(0x0, 0x0, 0x96, 0x0D, &kgdt[3]);      /* kernel stack */
+    init_gdt_desc(0x0, 0xFFFFF, 0xFA, 0x0D, &kgdt[4]);  /* user code */
+    init_gdt_desc(0x0, 0xFFFFF, 0xF2, 0x0D, &kgdt[5]);  /* user data */
+    init_gdt_desc(0x0, 0x0, 0xF6, 0x0D, &kgdt[6]);      /* user stack */
 
-	/* initialize the gdtr structure */
-	kgdtr.limit = GDTSIZE * 8;
-	kgdtr.base = GDTBASE;
+    /* initialize the gdtr structure */
+    kgdtr.limit = sizeof(kgdt) - 1;
+    kgdtr.base = (u32) &kgdt;
 
-	/* copy the gdtr to its memory area */
-	memcpy((char *) kgdtr.base, (char *) kgdt, kgdtr.limit);
+    /* load the gdtr registry */
+    asm("lgdtl (kgdtr)");
 
-	// AT&T style assembly
-	/* load the gdtr registry */
-	asm("lgdtl (kgdtr)");
-
-	/* initiliaze the segments */
-	asm("   movw $0x10, %ax	\n \
-                movw %ax, %ds	\n \
-                movw %ax, %es	\n \
-                movw %ax, %fs	\n \
-                movw %ax, %gs	\n \
-                ljmp $0x08, $next	\n \
-                next:		\n");
+    /* reload segment registers */
+    asm("   ljmp $0x08, $flush   \n\
+          flush:                 \n\
+          movw $0x10, %ax         \n\
+          movw %ax, %ds           \n\
+          movw %ax, %es           \n\
+          movw %ax, %fs           \n\
+          movw %ax, %gs           \n\
+    ");
 }
 
 void isr_bbd_int(void)
@@ -145,6 +139,7 @@ void do_syscalls(int num){
 	 
 	 asm("sti");
 }
+
 void isr_default_int(int num)
 {
 	return ;

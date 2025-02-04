@@ -68,7 +68,7 @@ void kmain(void)
 	pprint("Setting Global Descriptor Table");	
 	//initializing the Global Descriptor Table
 	init_gdt();
-	print("Global Descriptor Table done", strlen("Global Descriptor Table done"), com);	
+	pprint("okay");	
 
 	init_idt();	
 	pprint("Interrupt Descriptor Table done");	
