@@ -56,7 +56,7 @@ void init_idt(void)
     init_idt_desc(0x08, (u32)_asm_int_1, INTGATE, &kidt[33]);
 
     // System call handling
- //   init_idt_desc(0x08, (u32)_asm_syscalls, TRAPGATE, &kidt[48]);  // Syscall
+  //   init_idt_desc(0x08, (u32)_asm_syscalls, TRAPGATE, &kidt[48]);  // Syscall
   //  init_idt_desc(0x08, (u32)_asm_syscalls, TRAPGATE, &kidt[128]); // Syscall
 
     // Set IDTR values
@@ -65,6 +65,7 @@ void init_idt(void)
 
     // Load IDT
     asm volatile("lidt %0" : : "m" (kidtr));
+    asm volatile("sti"); //set the interrupt flag.
 }
 
 /*

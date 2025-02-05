@@ -87,9 +87,7 @@ void kmain(void)
 
 	while(1)
 	{
-//		__asm__ ("sti");
-	//	asm volatile("hlt");
-	//	asm volatile("int $0x20");  // Manually trigger the timer interrupt
+		asm volatile("hlt");
 	}
 
 
