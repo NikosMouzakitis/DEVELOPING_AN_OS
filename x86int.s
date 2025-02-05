@@ -1,6 +1,10 @@
-extern	isr_default_int, do_syscalls, isr_schedule_int, isr_GP_exc, isr_PF_exc 
+extern	isr_default_int, isr_timer_int, do_syscalls, isr_schedule_int, isr_GP_exc, isr_PF_exc 
 
 global	_asm_syscalls, _asm_exc_GP, _asm_exc_PF, _asm_schedule
+
+global _asm_int_1
+global _asm_int_2
+global _asm_int_32
 
 %macro	SAVE_REGS 0
 	pushad 
@@ -25,16 +29,31 @@ global	_asm_syscalls, _asm_exc_GP, _asm_exc_PF, _asm_schedule
 %macro	INTERRUPT 1
 global _asm_int_%1
 _asm_int_%1:
+	cli
 	SAVE_REGS
 	push %1
 	call isr_default_int
-	pop eax	;;a enlever sinon
+	pop eax
 	mov al,0x20
 	out 0x20,al
 	RESTORE_REGS
+	sti ;re-enable irqs
 	iret
 %endmacro
 
 INTERRUPT 1
 INTERRUPT 2
-INTERRUPT 32 ; irq0 - timer interrupts from PIT
+
+; Special handling for timer interrupt (IRQ0 - int 0x20)
+_asm_int_32:
+	cli
+	SAVE_REGS
+	push 32
+	call isr_timer_int  ; Call the actual timer ISR 
+	pop eax
+	mov al, 0x20
+	out 0x20, al
+	RESTORE_REGS
+	sti ;reenable irqs
+	iret
+

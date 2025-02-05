@@ -43,8 +43,8 @@ void init_idt(void)
 
     // Initialize all IDT entries with a default handler
     for (i = 0; i < IDTSIZE; i++) {
-        init_idt_desc(0x08, (u32)isr_timer_int, INTGATE, &kidt[i]);
-        //init_idt_desc(0x08, (u32)_asm_int_32, INTGATE, &kidt[i]);
+  //      init_idt_desc(0x08, (u32)isr_timer_int, INTGATE, &kidt[i]);
+        init_idt_desc(0x08, (u32)_asm_int_1, INTGATE, &kidt[i]);
     }
 
     // Set up exceptions
@@ -52,7 +52,7 @@ void init_idt(void)
    // init_idt_desc(0x08, (u32)_asm_exc_PF, INTGATE, &kidt[14]);  // #PF
 
     // Set up IRQ handlers
-    init_idt_desc(0x08, (u32)isr_timer_int, INTGATE, &kidt[32]);
+    init_idt_desc(0x08, (u32)_asm_int_32, INTGATE, &kidt[32]);
     init_idt_desc(0x08, (u32)_asm_int_1, INTGATE, &kidt[33]);
 
     // System call handling
