@@ -12,7 +12,16 @@ extern void _asm_int_1(void);
 extern void _asm_syscalls(void);
 extern void _asm_exc_GP(void);
 extern void _asm_exc_PF(void);
-extern void _asm_schedule(void);
+//extern void _asm_schedule(void);
+extern void _asm_int_32(void); //timer interrupt(pit)
+volatile int tick_count =0;
+
+void isr_timer_int(void) {
+	tick_count++;
+	pprint("tmr irq fired");
+	outb(0x20, 0x20);  // Send EOI end of interrupt to PIC1 (IRQ0)
+	outb(0xA0, 0x20);  // Send EOI to PIC2 (Slave PIC)
+}
 
 // Function to define an IDT segment
 void init_idt_desc(unsigned short select, unsigned int offset, unsigned short type,struct idtdesc *desc)
@@ -32,22 +41,23 @@ void init_idt(void)
 {
     int i;
 
-    // Initialize all IDT entries with default handler (_asm_schedule)
+    // Initialize all IDT entries with a default handler
     for (i = 0; i < IDTSIZE; i++) {
-        init_idt_desc(0x08, (u32)_asm_schedule, INTGATE, &kidt[i]);
+        init_idt_desc(0x08, (u32)isr_timer_int, INTGATE, &kidt[i]);
+        //init_idt_desc(0x08, (u32)_asm_int_32, INTGATE, &kidt[i]);
     }
 
     // Set up exceptions
-    init_idt_desc(0x08, (u32)_asm_exc_GP, INTGATE, &kidt[13]);  // #GP
-    init_idt_desc(0x08, (u32)_asm_exc_PF, INTGATE, &kidt[14]);  // #PF
+   // init_idt_desc(0x08, (u32)_asm_exc_GP, INTGATE, &kidt[13]);  // #GP
+   // init_idt_desc(0x08, (u32)_asm_exc_PF, INTGATE, &kidt[14]);  // #PF
 
     // Set up IRQ handlers
-    init_idt_desc(0x08, (u32)_asm_schedule, INTGATE, &kidt[32]);
+    init_idt_desc(0x08, (u32)isr_timer_int, INTGATE, &kidt[32]);
     init_idt_desc(0x08, (u32)_asm_int_1, INTGATE, &kidt[33]);
 
     // System call handling
-    init_idt_desc(0x08, (u32)_asm_syscalls, TRAPGATE, &kidt[48]);  // Syscall
-    init_idt_desc(0x08, (u32)_asm_syscalls, TRAPGATE, &kidt[128]); // Syscall
+ //   init_idt_desc(0x08, (u32)_asm_syscalls, TRAPGATE, &kidt[48]);  // Syscall
+  //  init_idt_desc(0x08, (u32)_asm_syscalls, TRAPGATE, &kidt[128]); // Syscall
 
     // Set IDTR values
     kidtr.limit = sizeof(kidt) - 1;
@@ -120,6 +130,7 @@ void isr_bbd_int(void)
 
 
 // hide for the mo
+/*
 void do_syscalls(int num){
 	 u32 ret,ret1,ret2,ret3,ret4;
 	 
@@ -139,11 +150,12 @@ void do_syscalls(int num){
 	 
 	 asm("sti");
 }
-
+*/
 void isr_default_int(int num)
 {
 	return ;
 }
+/*
 void isr_schedule_int(int num)
 {
 	return ;
@@ -155,4 +167,41 @@ void isr_GP_exc(int num)
 void isr_PF_exc(int num)
 {
 	return ;
+}
+*/
+
+// Programmable Interrupt Controller Initialization
+void init_pic() {
+    // Start initialization sequence (ICW1)
+    outb(PIC1_COMMAND, 0x11); // Initialize PIC1
+    outb(PIC2_COMMAND, 0x11); // Initialize PIC2
+
+    // Remap interrupt vectors
+    outb(PIC1_DATA, 0x20); // IRQ0-7 → INT 0x20-0x27
+    outb(PIC2_DATA, 0x28); // IRQ8-15 → INT 0x28-0x2F
+
+    // Set up cascading: PIC1 (IRQ2) connects to PIC2
+    outb(PIC1_DATA, 4); // Tell PIC1 that PIC2 is on IRQ2 (0b00000100)
+    outb(PIC2_DATA, 2); // Tell PIC2 that it is connected to PIC1 (IRQ2)
+
+    // Enable 8086 mode
+    outb(PIC1_DATA, 0x01);
+    outb(PIC2_DATA, 0x01);
+
+    // Mask all interrupts except the timer (IRQ0)
+    outb(PIC1_DATA, 0xFE); // 0xFD = 1111 1101 (Unmask IRQ0 and IRQ2)
+    outb(PIC2_DATA, 0xFF); // Mask all interrupts on PIC2
+
+    // Send End-of-Interrupt (EOI) to clear any pending interrupts
+    outb(PIC1_COMMAND, 0x20);
+    outb(PIC2_COMMAND, 0x20);
+}
+
+void init_pit(u32 frequency)
+{
+    u16 divisor = 1193180 / frequency; // PIT frequency is 1.19318 MHz
+    outb(PIT_COMMAND, 0x36);
+    outb(PIT_CHANNEL0, divisor & 0xFF);
+    outb(PIT_CHANNEL0, (divisor >> 8) & 0xFF);
+
 }

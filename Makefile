@@ -4,14 +4,14 @@ OBJECTS= loader.o io.o x86int.o x86.o framebuffer.o serial.o strlib.o kmain.o
 CC= gcc
 
 CFLAGS= -m32 -nostdlib -nostdinc -fno-builtin -fno-stack-protector \
-	-nostartfiles -nodefaultlibs -Wall -Wextra -Wno-error -Wno-unused-variable \
-        -c
+	-nostartfiles -nodefaultlibs -Wall -Wextra -Wno-error -Wno-unused-variable -Wunused-parameter \
+        -c -g
 
 LDFLAGS= -T link.ld -melf_i386
 
 AS= nasm
 
-ASFLAGS= -f elf
+ASFLAGS= -f  elf
 
 all: kernel.elf
 

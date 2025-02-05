@@ -35,37 +35,6 @@ _asm_int_%1:
 	iret
 %endmacro
 
-_asm_syscalls:
-	SAVE_REGS
-	push eax                 ; transmission du numero d'appel
-	call do_syscalls
-	pop eax
-	cli
-	sti
-	RESTORE_REGS
-	iret
-
-_asm_exc_GP:
-	SAVE_REGS
-	call isr_GP_exc
-	RESTORE_REGS
-	add esp,4
-	iret
-
-_asm_exc_PF:
-	SAVE_REGS
-	call isr_PF_exc
-	RESTORE_REGS
-	add esp,4
-	iret
-
-_asm_schedule:
-	SAVE_REGS
-	call isr_schedule_int
-	mov al,0x20
-	out 0x20,al
-	RESTORE_REGS
-	iret
-
 INTERRUPT 1
 INTERRUPT 2
+INTERRUPT 32 ; irq0 - timer interrupts from PIT

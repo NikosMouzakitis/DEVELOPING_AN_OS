@@ -69,7 +69,28 @@ void kmain(void)
 	//initializing the Global Descriptor Table
 	init_gdt();
 	pprint("okay");	
-
+	
+	pprint("Initializing Interrupt Descriptor Table");	
 	init_idt();	
-	pprint("Interrupt Descriptor Table done");	
+	pprint("okay");
+
+	pprint("Initializing PIC");
+	init_pic();
+	pprint("okay");
+
+	pprint("Initializing PIT");
+	init_pit(1);
+	pprint("okay");
+
+	pprint("Enabling irq's");
+	pprint("okay");
+
+	while(1)
+	{
+		__asm__ ("sti");
+	//	asm volatile("hlt");
+	//	asm volatile("int $0x20");  // Manually trigger the timer interrupt
+	}
+
+
 }
