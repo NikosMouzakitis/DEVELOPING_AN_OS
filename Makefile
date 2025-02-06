@@ -19,21 +19,16 @@ kernel.elf: $(OBJECTS)
 	ld $(LDFLAGS) $(OBJECTS) -o kernel.elf
 
 os.iso: kernel.elf
-	cp kernel.elf iso/boot/kernel.elf
-	genisoimage -R \
-	-b boot/grub/stage2_eltorito \
-	-no-emul-boot \
-	-boot-load-size	4 \
-	-A os \
-	-input-charset	utf8 \
-	-quiet \
-	-boot-info-table \
-	-o os.iso	\
-	iso
-
+	# Copy the kernel into the ISO folder
+	cp kernel.elf iso/boot/
+	# Use grub-mkrescue to create the ISO image.
+	# Note: On some systems you might need to specify --modules="linux" or additional options.
+	grub-mkrescue -o os.iso iso	
+	
+	
 run: os.iso
-	qemu-system-x86_64 -kernel kernel.elf	
-#bochs -f bochs.txt -q
+	bochs -f bochs.txt -q
+	#qemu-system-x86_64 -kernel kernel.elf	
 
 %.o: %.s 
 	$(AS) $(ASFLAGS) $< -o $@

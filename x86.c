@@ -135,7 +135,7 @@ void isr_kbd_int(void)
 
 void isr_timer_int(void) {
 	tick_count++;
-//	pprint("tmr irq fired");
+	pprint("tmr irq fired");
 	outb(0x20, 0x20);  // Send EOI end of interrupt to PIC1 (IRQ0)
 	outb(0xA0, 0x20);  // Send EOI to PIC2 (Slave PIC)
 }
@@ -179,7 +179,7 @@ void init_pic() {
 
     // Mask all interrupts except the timer (IRQ0)
   //  outb(PIC1_DATA, 0xFE); // 0xFD = 1111 1101 (Unmask IRQ0 and IRQ2)
-    outb(PIC1_DATA, 0xFD); // 0xFD = 1111 1101 (Unmask IRQ0 and IRQ2)
+    outb(PIC1_DATA, 0xFC); // 0xFD = 1111 1101 (Unmask IRQ0 and IRQ2)
     outb(PIC2_DATA, 0xFF); // Mask all interrupts on PIC2
 
     // Send End-of-Interrupt (EOI) to clear any pending interrupts
