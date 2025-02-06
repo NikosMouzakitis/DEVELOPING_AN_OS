@@ -72,3 +72,4 @@ void isr_PF_exc(int num);
 void init_pic(void);
 void init_pit(u32 frequency);
 void isr_timer_int(void);
+void isr_kbd_int(void);

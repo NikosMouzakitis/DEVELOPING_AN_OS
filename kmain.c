@@ -85,10 +85,10 @@ void kmain(void)
 	pprint("Enabling irq's");
 	pprint("okay");
 
+	pprint(">>");
 	while(1)
 	{
 		asm volatile("hlt");
 	}
-
 
 }

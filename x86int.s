@@ -1,10 +1,11 @@
-extern	isr_default_int, isr_timer_int, do_syscalls, isr_schedule_int, isr_GP_exc, isr_PF_exc 
+extern	isr_default_int, isr_timer_int, isr_kbd_int, do_syscalls, isr_schedule_int, isr_GP_exc, isr_PF_exc 
 
 global	_asm_syscalls, _asm_exc_GP, _asm_exc_PF, _asm_schedule
 
 global _asm_int_1
 global _asm_int_2
 global _asm_int_32
+global _asm_int_33
 
 %macro	SAVE_REGS 0
 	pushad 
@@ -50,6 +51,18 @@ _asm_int_32:
 	SAVE_REGS
 	push 32
 	call isr_timer_int  ; Call the actual timer ISR 
+	pop eax
+	mov al, 0x20
+	out 0x20, al
+	RESTORE_REGS
+	sti ;reenable irqs
+	iret
+
+_asm_int_33:
+	cli
+	SAVE_REGS
+	push 33
+	call isr_kbd_int  ; Call the actual keyboard isr
 	pop eax
 	mov al, 0x20
 	out 0x20, al

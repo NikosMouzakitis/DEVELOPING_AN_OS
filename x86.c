@@ -14,15 +14,20 @@ extern void _asm_exc_GP(void);
 extern void _asm_exc_PF(void);
 //extern void _asm_schedule(void);
 extern void _asm_int_32(void); //timer interrupt(pit)
+extern void _asm_int_33(void); //keaboard interrupt(pit)
 volatile int tick_count =0;
 
-void isr_timer_int(void) {
-	tick_count++;
-	pprint("tmr irq fired");
-	outb(0x20, 0x20);  // Send EOI end of interrupt to PIC1 (IRQ0)
-	outb(0xA0, 0x20);  // Send EOI to PIC2 (Slave PIC)
-}
+/*
+void isr_kbd_int(void){
+	unsigned char scancode;
+	scancode = inb(0x60);  // Read scancode from the keyboard data port
+	char str[3];
+	itoa(scancode, str, 16);  // Convert the scancode to hexadecimal string
+	pprint(str);  // Print the scancode to screen or serial
+	outb(0x20, 0x20);  // End of interrupt (EOI) for IRQ1
 
+}
+*/
 // Function to define an IDT segment
 void init_idt_desc(unsigned short select, unsigned int offset, unsigned short type,struct idtdesc *desc)
 {
@@ -52,8 +57,8 @@ void init_idt(void)
    // init_idt_desc(0x08, (u32)_asm_exc_PF, INTGATE, &kidt[14]);  // #PF
 
     // Set up IRQ handlers
-    init_idt_desc(0x08, (u32)_asm_int_32, INTGATE, &kidt[32]);
-    init_idt_desc(0x08, (u32)_asm_int_1, INTGATE, &kidt[33]);
+    init_idt_desc(0x08, (u32)_asm_int_32, INTGATE, &kidt[32]); //timer
+    init_idt_desc(0x08, (u32)_asm_int_33, INTGATE, &kidt[33]); //keaboard
 
     // System call handling
   //   init_idt_desc(0x08, (u32)_asm_syscalls, TRAPGATE, &kidt[48]);  // Syscall
@@ -115,43 +120,26 @@ void init_gdt(void)
     ");
 }
 
-void isr_bbd_int(void)
+void isr_kbd_int(void)
 {
-	u8	i;
-//	static int lshift_enable;
-//	static int rshift_enable;
-//	static int alt_enable;
-//	static int ctrl_enable;
-	
-	do {
-		i = inb(0x64);
-	} while ( (i & 0x01) == 0);
-
+//	u8 scancode;
+	pprint("a");
+	inb(0x60);
+//	scancode = inb(0x60);  // Read scancode from the keyboard data port
+//	char str[3];
+//	itoa(scancode, str, 16);  // Convert the scancode to hexadecimal string
+	//pprint(str);  // Print the scancode to screen or serial
+	outb(0x20,0x20); //eoi
+	//outb(0xA0, 0x20);  // Send EOI to PIC2 (Slave PIC)
 }
 
-
-// hide for the mo
-/*
-void do_syscalls(int num){
-	 u32 ret,ret1,ret2,ret3,ret4;
-	 
-	 asm("mov %%ebx, %0": "=m"(ret):);
-	 asm("mov %%ecx, %0": "=m"(ret1):);
-	 asm("mov %%edx, %0": "=m"(ret2):);
-	 asm("mov %%edi, %0": "=m"(ret3):);
-	 asm("mov %%esi, %0": "=m"(ret4):);
-	  //fix the following comes from C++ code. 
-	 //arch.setParam(ret,ret1,ret2,ret3,ret4);
-	
-	 asm("cli");
-	 asm("mov %%ebp, %0": "=m"(stack_ptr):);
-
-	 
-	 //syscall.call(num);
-	 
-	 asm("sti");
+void isr_timer_int(void) {
+	tick_count++;
+//	pprint("tmr irq fired");
+	outb(0x20, 0x20);  // Send EOI end of interrupt to PIC1 (IRQ0)
+	outb(0xA0, 0x20);  // Send EOI to PIC2 (Slave PIC)
 }
-*/
+
 void isr_default_int(int num)
 {
 	return ;
@@ -190,7 +178,8 @@ void init_pic() {
     outb(PIC2_DATA, 0x01);
 
     // Mask all interrupts except the timer (IRQ0)
-    outb(PIC1_DATA, 0xFE); // 0xFD = 1111 1101 (Unmask IRQ0 and IRQ2)
+  //  outb(PIC1_DATA, 0xFE); // 0xFD = 1111 1101 (Unmask IRQ0 and IRQ2)
+    outb(PIC1_DATA, 0xFD); // 0xFD = 1111 1101 (Unmask IRQ0 and IRQ2)
     outb(PIC2_DATA, 0xFF); // Mask all interrupts on PIC2
 
     // Send End-of-Interrupt (EOI) to clear any pending interrupts
