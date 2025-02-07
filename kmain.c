@@ -59,6 +59,7 @@ void kmain(void)
 	//setting up COM1 and clearing screen.	
 	set_up_com(com);	
 	clear_screen();
+	fb_write_test_pattern();
 	//display first message on screen.
 	pprint(osInitialmsg);
 	delay(100,1000,200);	
@@ -84,7 +85,6 @@ void kmain(void)
 
 	pprint("Enabling irq's");
 	pprint("okay");
-
 	pprint(">>");
 	while(1)
 	{

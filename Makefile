@@ -25,17 +25,10 @@ os.iso: kernel.elf
 	# Note: On some systems you might need to specify --modules="linux" or additional options.
 	grub-mkrescue -o os.iso iso	
 	
-	
-run: os.iso
-	bochs -f bochs.txt -q
-	#qemu-system-x86_64 -kernel kernel.elf	
-
 %.o: %.s 
 	$(AS) $(ASFLAGS) $< -o $@
 
-
 %.o: %.c
 	$(CC) $(CFLAGS) $< -o $@
-
 clean:
 	rm -rf *.o kernel.elf os.iso bochslog.txt com1.out

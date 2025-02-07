@@ -135,7 +135,7 @@ void isr_kbd_int(void)
 
 void isr_timer_int(void) {
 	tick_count++;
-	pprint("tmr irq fired");
+//	pprint("tmr irq fired");
 	outb(0x20, 0x20);  // Send EOI end of interrupt to PIC1 (IRQ0)
 	outb(0xA0, 0x20);  // Send EOI to PIC2 (Slave PIC)
 }

@@ -9,7 +9,10 @@
 #define	FB_LOW_BYTE_COMMAND	15
 
 
-
+//This function updates the position of the text cursor in the VGA framebuffer 
+//by writing to VGA I/O ports. 
+//It makes the hardware cursor visible at the 
+//position specified by pos.
 void fb_move_cursor(unsigned short pos)
 {
 	outb(FB_COMMAND_PORT, FB_HIGH_BYTE_COMMAND);

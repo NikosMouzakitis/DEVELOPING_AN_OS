@@ -1,7 +1,9 @@
 #ifndef	__INCLUDE_FRAMEBUFFER_H
 #define __INCLUDE_FRAMEBUFFER_H
 
-
+#define SCREEN_WIDTH	80	
+#define SCREEN_HEIGHT	25	
+#define CELL_SIZE	2
 extern int cursorPos;
 
 //writes at framebuffer's cell (i) the character (c). 
@@ -16,5 +18,8 @@ void update_cursor_position(void);
 
 /* advance in the next line	*/
 void update_cursor_next_line(void);
+
+/* move all lines up by 1 line */
+void fb_scroll(void);
 
 #endif
