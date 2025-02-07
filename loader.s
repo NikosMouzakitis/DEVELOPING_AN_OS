@@ -3,8 +3,8 @@ extern	kmain
 
 align 4
 MAGIC_NUMBER	equ 0x1BADB002		;magic number constant
-FLAGS	equ	0x0			;flags for multiboot
-CHECKSUM	equ -MAGIC_NUMBER	;calculating a checksum
+FLAGS	equ	0x3			;flags for multiboot, can get info about various aspects from GRUB2.
+CHECKSUM	equ -MAGIC_NUMBER-FLAGS	;calculating a checksum
 KERNEL_STACK_SIZE	equ	4096	;size of stack in bytes.
 
 section .multiboot_header
