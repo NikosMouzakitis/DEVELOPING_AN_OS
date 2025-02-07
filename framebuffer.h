@@ -4,6 +4,9 @@
 #define SCREEN_WIDTH	80	
 #define SCREEN_HEIGHT	25	
 #define CELL_SIZE	2
+
+
+
 extern int cursorPos;
 
 //writes at framebuffer's cell (i) the character (c). 

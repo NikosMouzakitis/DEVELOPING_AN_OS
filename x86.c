@@ -12,22 +12,11 @@ extern void _asm_int_1(void);
 extern void _asm_syscalls(void);
 extern void _asm_exc_GP(void);
 extern void _asm_exc_PF(void);
-//extern void _asm_schedule(void);
 extern void _asm_int_32(void); //timer interrupt(pit)
 extern void _asm_int_33(void); //keaboard interrupt(pit)
+
 volatile int tick_count =0;
 
-/*
-void isr_kbd_int(void){
-	unsigned char scancode;
-	scancode = inb(0x60);  // Read scancode from the keyboard data port
-	char str[3];
-	itoa(scancode, str, 16);  // Convert the scancode to hexadecimal string
-	pprint(str);  // Print the scancode to screen or serial
-	outb(0x20, 0x20);  // End of interrupt (EOI) for IRQ1
-
-}
-*/
 // Function to define an IDT segment
 void init_idt_desc(unsigned short select, unsigned int offset, unsigned short type,struct idtdesc *desc)
 {
@@ -36,7 +25,6 @@ void init_idt_desc(unsigned short select, unsigned int offset, unsigned short ty
 	desc->select = select;
 	desc->type = type;
 	desc->offset16_31 = (offset & 0xffff0000) >> 16;
-	
 }
 
 /*
@@ -122,15 +110,37 @@ void init_gdt(void)
 
 void isr_kbd_int(void)
 {
-//	u8 scancode;
-	pprint("a");
-	inb(0x60);
-//	scancode = inb(0x60);  // Read scancode from the keyboard data port
-//	char str[3];
-//	itoa(scancode, str, 16);  // Convert the scancode to hexadecimal string
-	//pprint(str);  // Print the scancode to screen or serial
+	u8 scancode;
+	//pprint("a");
+	scancode = inb(0x60);  // Read scancode from the keyboard data port
+	
+	
+	if(scancode == ENTER_KEY) {
+		keyboard_buffer[kb_buffer_index]='\0'; //null terminated string.
+		kb_buffer_index = 0; //reset
+	//	process_command(keyboard_buffer); //call function to process user's command.
+		fb_writeln("\n",1);		
+	} else if (scancode == BACKSPACE_KEY) {
+		if(kb_buffer_index > 0)
+		{
+			kb_buffer_index--; //decrement index.
+			fb_write("\b \b",3); //erase visually one character.
+		}
+	} else {
+
+		char c = scancode_to_ascii(scancode); //convertion
+		if(c != '\0') //ensure it is not a release press action
+		{
+			if(c && kb_buffer_index < KEYBOARD_BUFFER_SIZE - 1) {
+				keyboard_buffer[kb_buffer_index++] = c;
+				fb_write(&c,1);
+			}
+		}
+	}
+
+	//acknowledge the interrupt.
 	outb(0x20,0x20); //eoi
-	//outb(0xA0, 0x20);  // Send EOI to PIC2 (Slave PIC)
+	outb(0xA0, 0x20);  // Send EOI to PIC2 (Slave PIC)
 }
 
 void isr_timer_int(void) {

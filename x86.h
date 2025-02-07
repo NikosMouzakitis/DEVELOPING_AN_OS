@@ -1,5 +1,4 @@
 #include "strlib.h"	//character array functionality
-
 #define IDTBASE		0x00000000
 #define IDTSIZE		0xff
 #define INTGATE		0x8e00 //interrupts

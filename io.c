@@ -8,6 +8,8 @@
 #define	FB_HIGH_BYTE_COMMAND	14
 #define	FB_LOW_BYTE_COMMAND	15
 
+char keyboard_buffer[KEYBOARD_BUFFER_SIZE];
+kb_buffer_index = 0; //index used for keyboard_buffer.
 
 //This function updates the position of the text cursor in the VGA framebuffer 
 //by writing to VGA I/O ports. 
