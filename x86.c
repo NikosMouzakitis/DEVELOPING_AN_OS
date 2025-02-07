@@ -1,6 +1,9 @@
 #include "x86.h"
 #include "io.h"
 
+#define BG_GREEN	2
+#define BG_BLACK	0
+
 struct idtdesc 	kidt[IDTSIZE]; 		/* IDT table */
 struct gdtdesc 	kgdt[GDTSIZE];		/* GDT */
 struct gdtr 		kgdtr;				/* GDTR */
@@ -14,7 +17,7 @@ extern void _asm_exc_GP(void);
 extern void _asm_exc_PF(void);
 extern void _asm_int_32(void); //timer interrupt(pit)
 extern void _asm_int_33(void); //keaboard interrupt(pit)
-
+extern int cursorPos;
 volatile int tick_count =0;
 
 // Function to define an IDT segment
@@ -119,12 +122,17 @@ void isr_kbd_int(void)
 		keyboard_buffer[kb_buffer_index]='\0'; //null terminated string.
 		kb_buffer_index = 0; //reset
 	//	process_command(keyboard_buffer); //call function to process user's command.
-		fb_writeln("\n",1);		
+//		fb_writeln("\n",1);		
+		update_cursor_next_line();
 	} else if (scancode == BACKSPACE_KEY) {
 		if(kb_buffer_index > 0)
 		{
 			kb_buffer_index--; //decrement index.
-			fb_write("\b \b",3); //erase visually one character.
+
+			cursorPos--;
+			fb_write_cell(cursorPos*2,' ',BG_BLACK, BG_GREEN); //erase visually one character.
+
+			fb_move_cursor(cursorPos);
 		}
 	} else {
 

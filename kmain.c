@@ -1,3 +1,4 @@
+#include "paging.h"
 #include "io.c"
 #include "framebuffer.h"
 #include "serial.h"
@@ -83,9 +84,13 @@ void kmain(void)
 	init_pit(1);
 	pprint("okay");
 
+	//Paging initialization
+	init_paging();
+
 	pprint("Enabling irq's");
 	pprint("okay");
 	pprint(">>");
+	
 	while(1)
 	{
 		asm volatile("hlt");
