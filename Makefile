@@ -13,7 +13,7 @@ AS= nasm
 
 ASFLAGS= -f  elf
 
-all: kernel.elf
+all: os.iso
 
 kernel.elf: $(OBJECTS)
 	ld $(LDFLAGS) $(OBJECTS) -o kernel.elf

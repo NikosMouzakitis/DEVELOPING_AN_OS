@@ -9,7 +9,7 @@ u32 kernel_page_table[NUM_ENTRIES] __attribute__((aligned(4096)));
 // Fill the identity page table to map the first MB (0x00000000 - 0x000FFFFF)
 static void init_identity_page_table(void) {
     u32 phys_addr = 0x00000000; // Start mapping from 0x00000000
-    for (u32 i = 0; i < 512; i++) {  // 256 * 4 KB = 1 MB
+    for (u32 i = 0; i < 2*512; i++) {  // 256 * 4 KB = 1 MB
         identity_page_table[i] = phys_addr | 3; // Present (bit 0) | Writable (bit 1)
         phys_addr += 4096; // Move to next 4 KB page
     }
