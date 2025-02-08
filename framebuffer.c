@@ -5,6 +5,8 @@
 #define BG_BLACK	0
 #define FBUF_ADR	0x000B8000
 
+#define SERIAL_COM1_BASE       0x3F8
+
 int cursorPos ; //cursor possition on the screen.(extern in .h)
 
 //lookup table to convert keyboard scan codes to ASCII.
@@ -15,6 +17,96 @@ const char scancode_ascii[] = {
     0, '\\', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 0,
     '*', 0, ' ', 0
 };
+
+// Helper function to print a single character
+void putchar(char c) {
+    fb_write_cell(cursorPos*2,c,BG_BLACK,BG_GREEN);        // Write to framebuffer
+    cursorPos++;
+    update_cursor_position();
+    //serial_write(SERIAL_COM1_BASE, c);  // Write to serial port
+}
+
+// Helper function to print a string
+void print_string(const char* str) {
+    while (*str) {
+        putchar(*str++);
+    }
+}
+
+// Helper function to print a hexadecimal number
+void print_hex(unsigned int num) {
+    char buffer[9];  // 8 hex digits + null terminator
+    const char* hex_digits = "0123456789ABCDEF";
+    int i = 7;
+
+    buffer[8] = '\0';  // Null-terminate the string
+
+    // Convert the number to hexadecimal
+    do {
+        buffer[i--] = hex_digits[num & 0xF];
+        num >>= 4;
+    } while (i >= 0);
+
+    print_string(buffer);
+}
+
+// Helper function to print a signed integer
+void print_int(int num) {
+    char buffer[12];  // Enough for 32-bit integers
+    int i = 0;
+
+    if (num < 0) {
+        putchar('-');
+        num = -num;
+    }
+
+    // Convert the number to a string
+    do {
+        buffer[i++] = '0' + (num % 10);
+        num /= 10;
+    } while (num > 0);
+
+    // Print the string in reverse order
+    while (i > 0) {
+        putchar(buffer[--i]);
+    }
+}
+
+// printf-style function
+void printf(const char* format, ...) {
+    // Access the variable arguments directly from the stack
+    unsigned int* arg_ptr = (unsigned int*)&format + 1;
+
+    while (*format) {
+        if (*format == '%') {
+            format++;  // Move past '%'
+            switch (*format) {
+                case 'x':  // Hexadecimal
+                    print_hex(*arg_ptr++);
+                    break;
+                case 's':  // String
+                    print_string((const char*)*arg_ptr++);
+                    break;
+                case 'c':  // Character
+                    putchar((char)*arg_ptr++);
+                    break;
+                case 'd':  // Signed decimal
+                    print_int((int)*arg_ptr++);
+                    break;
+                case '%':  // Literal '%'
+                    putchar('%');
+                    break;
+                default:   // Unsupported format specifier
+                    putchar('%');
+                    putchar(*format);
+                    break;
+            }
+        } else {
+            putchar(*format);
+        }
+        format++;
+    }
+}
 
 
 void fb_scroll(void) {

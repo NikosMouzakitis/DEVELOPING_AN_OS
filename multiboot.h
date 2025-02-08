@@ -1,3 +1,24 @@
+// definitions to help get information 
+// from GRUB about memory mappings on the platform.
+
+#ifndef MULTIBOOT_H
+#define MULTIBOOT_H
+typedef signed char int8_t;
+typedef unsigned char uint8_t;
+
+typedef signed short int16_t;
+typedef unsigned short uint16_t;
+
+typedef signed long int int32_t;
+typedef unsigned long int uint32_t;
+
+typedef signed long long int int64_t;
+typedef unsigned long long int uint64_t;
+
+typedef uint8_t bool;
+#define true 1
+#define false 0
+
 struct multiboot_aout_symbol_table
 {
   uint32_t tabsize;
@@ -62,3 +83,5 @@ struct multiboot_mmap_entry
 #define MULTIBOOT_MEMORY_BADRAM                 5
   uint32_t type;
 } __attribute__((packed));
+
+#endif MULTIBOOT_H

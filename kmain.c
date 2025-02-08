@@ -3,6 +3,7 @@
 #include "framebuffer.h"
 #include "serial.h"
 #include "x86.h"
+#include "multiboot.h"
 
 #define BG_GREEN	2
 #define BG_BLACK	0 
@@ -51,7 +52,7 @@ void pprint(char *s)
 }
 
 /* start execution of testOS */
-void kmain(void)
+void kmain(u32 magic, struct multiboot_info *bootInfo)
 {
 	char * osInitialmsg = "TestOS initialized.";
 	int com = SERIAL_COM1_BASE;
@@ -84,13 +85,21 @@ void kmain(void)
 	init_pit(1);
 	pprint("okay");
 
+	//explain this one.
+        u32 mod1 = *(u32 *)(bootInfo->mods_addr + 4);
+	u32 physicalAllocStart = (mod1 + 0xFFF) & ~0xFFF;
+	
+	printf("mod1: %x",mod1);
+	pprint("");
+	printf("phAl: %x",physicalAllocStart);
+	pprint("");
 	//Paging initialization
-	init_paging();
+//	init_paging();
 
 	pprint("Enabling irq's");
 	pprint("okay");
 	pprint(">>");
-	
+
 	while(1)
 	{
 		asm volatile("hlt");

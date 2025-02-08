@@ -18,6 +18,10 @@ align	4
 loader:	
 	mov	eax, 0xCAFEBABE
 	mov	esp, kernel_stack+KERNEL_STACK_SIZE	; saving at esp to the start of the kernel start(grows downwards)
+
+	push ebx
+	push eax
+
 	call	kmain		; calling the C function from kmain.c, entering the OS
 loop:
 	jmp loop
