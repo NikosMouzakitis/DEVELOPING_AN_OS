@@ -25,4 +25,5 @@ void update_cursor_next_line(void);
 /* move all lines up by 1 line */
 void fb_scroll(void);
 
+void printf(const char* format, ...);
 #endif

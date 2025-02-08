@@ -1,5 +1,5 @@
 #OBJECTS= loader.o io.o x86.o framebuffer.o serial.o strlib.o kmain.o
-OBJECTS= loader.o io.o x86int.o x86.o framebuffer.o serial.o strlib.o paging.o kmain.o
+OBJECTS= loader.o io.o x86int.o x86.o framebuffer.o serial.o strlib.o paging.o memory.o kmain.o
 
 CC= gcc
 
