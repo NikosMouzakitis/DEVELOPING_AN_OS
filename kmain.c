@@ -86,19 +86,19 @@ void kmain(u32 magic, struct multiboot_info *bootInfo)
 //	pprint("okay");
 
 	//explain this one.
-        u32 mod1 = *(u32 *)(bootInfo->mods_addr + 4);
-	u32 physicalAllocStart = (mod1 + 0xFFF) & ~0xFFF;
+       // u32 mod1 = *(u32 *)(bootInfo->mods_addr + 4);
+//	u32 physicalAllocStart = (mod1 + 0xFFF) & ~0xFFF;
 	
-	printf("mod1: %x",mod1);
-	pprint("");
-	printf("phAl: %x",physicalAllocStart);
-	pprint("");
+//	printf("mod1: %x",mod1);
+//	pprint("");
+//	printf("phAl: %x",physicalAllocStart);
+//	pprint("");
 	
 	pprint("Enabling irq's");
 	pprint("okay");
 	pprint(">>");
 
-	init_memory(bootInfo);	
+//	init_memory(bootInfo);	
 	
 	//Paging initialization
 //	init_paging();
