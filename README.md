@@ -17,6 +17,13 @@ an image from early boot prints.
 # qemu monitor commands-can be used to verify what we implement
 
 *info mem:* shows areas where we have set page tables
+
 *info irq:* can show us the enabled interrupts f.e irq0-timer, irq1-keyboard
 and the number of their occurance.
 
+
+
+#resources
+
+*Multiboot specification format example code multiboot.h*
+https://www.gnu.org/software/grub/manual/multiboot/html_node/multiboot_002eh.html#multiboot_002eh
