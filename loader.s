@@ -24,8 +24,8 @@ loader:
 
 	;paging
 label1:
-	mov eax, (initial_page_dir - 0xC0000000)  
-	mov cr3, eax  ;where the pdt is 
+	mov ecx, (initial_page_dir - 0xC0000000)  
+	mov cr3, ecx  ;where the pdt is 
 	
 	mov ecx, cr4
 	or  ecx,0x10  ; required change in cr4
@@ -41,6 +41,7 @@ section .text
 higher_half:
 	mov	esp, kernel_stack+KERNEL_STACK_SIZE	; saving at esp to the start of the kernel start(grows downwards)
 	push	ebx		; for getting the boot info as argument in kmain 
+	push    eax		; magic number.
 	xor     ebp, ebp
 	call	kmain		; calling the C function from kmain.c, entering the OS
 loop:

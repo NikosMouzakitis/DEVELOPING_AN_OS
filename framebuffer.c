@@ -3,7 +3,7 @@
 
 #define BG_GREEN	2
 #define BG_BLACK	0
-#define FBUF_ADR	0x000B8000
+#define FBUF_ADR	0xC00B8000
 
 #define SERIAL_COM1_BASE       0x3F8
 

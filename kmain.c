@@ -56,49 +56,47 @@ void kmain(u32 magic, struct multiboot_info *bootInfo)
 {
 	char * osInitialmsg = "TestOS initialized.";
 	int com = SERIAL_COM1_BASE;
-//	struct gdtr GDT[8]; // exist in x86
-	cursorPos = 0;
+	cursorPos = 0; //reset.
 	//setting up COM1 and clearing screen.	
-	set_up_com(com);	
+	set_up_com(com); //abandoned com. // full prints on framebuffer. fix serial to follow all.	
 	clear_screen();
-//	fb_write_test_pattern();
+//	fb_write_test_pattern(); //test.
+//
 	//display first message on screen.
-//	pprint(osInitialmsg);
+	pprint(osInitialmsg);
 	delay(100,1000,200);	
 	//write first message on serial.
-//	pprint("init");	
 
 	pprint("Setting Global Descriptor Table");	
 	//initializing the Global Descriptor Table
 	init_gdt();
-//	pprint("okay");	
 	
 	pprint("Initializing Interrupt Descriptor Table");	
 	init_idt();	
-//	pprint("okay");
 
 	pprint("Initializing PIC");
 	init_pic();
-///	pprint("okay");
 
 	pprint("Initializing PIT");
 	init_pit(1);
-//	pprint("okay");
 
-	//explain this one.
-       // u32 mod1 = *(u32 *)(bootInfo->mods_addr + 4);
-//	u32 physicalAllocStart = (mod1 + 0xFFF) & ~0xFFF;
-	
-//	printf("mod1: %x",mod1);
-//	pprint("");
-//	printf("phAl: %x",physicalAllocStart);
-//	pprint("");
-	
+	//check GRUB passed values 
+
+	//where physical memory starts? 
+        u32 mod1 = *(u32 *)(bootInfo->mods_addr + 4);
+	u32 physicalAllocStart = (mod1 + 0xFFF) & ~0xFFF;
+	printf("mod1: %x",mod1);
+	pprint("");
+	printf("phAl: %x",physicalAllocStart);
+	pprint("");
+
+	printf("memH: %x",bootInfo->mem_upper*1024);
+	pprint("");	
 	pprint("Enabling irq's");
 	pprint("okay");
 	pprint(">>");
-
-//	init_memory(bootInfo);	
+				//high point, low point.
+	init_memory(bootInfo->mem_upper * 1024, physicalAllocStart);	
 	
 	//Paging initialization
 //	init_paging();
