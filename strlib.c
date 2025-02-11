@@ -10,6 +10,16 @@ int strlen(char * src)
 	return cnt;
 }
 
+//memset func.
+void memset(void *dest, char val, u32 count){
+    char *temp = (char*) dest;
+    for (; count != 0; count --){
+        *temp++ = val;
+    }
+
+}
+
+
 void memcpy(char *dest, char *src, int count)
 {
 	int i;
