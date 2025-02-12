@@ -21,14 +21,13 @@ kernel_stack:
 section	.boot  
 align	4
 loader:	
-
 	;paging
 label1:
 	mov ecx, (initial_page_dir - 0xC0000000)  
 	mov cr3, ecx  ;where the pdt is 
-	
+newpoint:	
 	mov ecx, cr4
-	or  ecx,0x10  ; required change in cr4
+	or  ecx,0x10  ; required change in cr4 to support 4Mb pages.(sets PSE)
 	mov cr4, ecx
 
 	mov ecx, cr0

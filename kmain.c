@@ -40,6 +40,12 @@ void delay(int i, int j, int k)
 				;
 }
 
+//test an address if its mapped on pg_table
+void test_access(u32 addr)
+{
+	char *e = (char *)addr;
+	*e = 'a';
+}
 void print(char * s, int l, int com)
 {
 	fb_writeln(s, l);
@@ -95,7 +101,8 @@ void kmain(u32 magic, struct multiboot_info *bootInfo)
 	pprint("Enabling irq's");
 	pprint("okay");
 	pprint(">>");
-				//high point, low point.
+
+	//high point, low point, fetched values from GRUB multiboot information.
 	init_memory(bootInfo->mem_upper * 1024, physicalAllocStart);	
 	
 	//Paging initialization

@@ -17,7 +17,10 @@ static totalAlloc; //how many pages allocated?
 u8 physicalMemoryBitmap[NUM_PAGE_FRAMES/8]; //should be done like a bitArray dynamic.
 static u32 pageDirs[NUM_PAGES_DIRS][1024] __attribute__((aligned(4096))); 
 static u8 pageDirUsed[NUM_PAGES_DIRS]; //used ones
-
+void func(void)
+{
+	int x =2;
+}
 //physical memory management
 void pmm_init(u32 memLow, u32 memHigh)
 {
@@ -32,11 +35,10 @@ void pmm_init(u32 memLow, u32 memHigh)
 }
 void init_memory(u32 memHigh, u32 physicalAllocStart)
 {
-
+	
 	//invalidating the initial 4KB mapping
 	initial_page_dir[0] = 0;
 	invalidate(0);
-
 	//recursive mapping from the end.
 	initial_page_dir[1023] = ( (u32) initial_page_dir - KERNEL_START) | PAGE_FLAG_PRESENT | PAGE_FLAG_WRITE;
 	invalidate(0xFFFFF000);
@@ -47,13 +49,14 @@ void init_memory(u32 memHigh, u32 physicalAllocStart)
 	
 	//set the second entry of the page directory with present and write flags.
 	//address : 0x0  flags: present and writable.
+	func();	
 	initial_page_dir[1] = 0x3;   
 
-//	pmm_init(physicalAllocStart, memHigh);
+	pmm_init(physicalAllocStart, memHigh);
 	//zero out all structure holding page Directories.
-//	memset(pageDirs, 0, 0x1000*NUM_PAGES_DIRS);
+	memset(pageDirs, 0, 0x1000*NUM_PAGES_DIRS);
 	//zero out all structure holding page directories used.
-//	memset(pageDirUsed, 0,NUM_PAGES_DIRS);
+	memset(pageDirUsed, 0,NUM_PAGES_DIRS);
 }
 
 void invalidate(u32 vaddr)
